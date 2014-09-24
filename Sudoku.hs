@@ -12,12 +12,16 @@ rows (Sudoku rs) = rs
 
 -- allBlankSudoku is a sudoku with just blanks
 allBlankSudoku :: Sudoku
-allBlankSudoku = undefined
+allBlankSudoku = Sudoku (replicate 9 row)
+    where row = replicate 9 Nothing
 
 -- isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku = undefined
+isSudoku s = and [and b | b = [length (rows s) == 9, length r == 9]]
+    where 
+        r = [row | row <- (rows s)]
+        p = [pos | pos <- r]
 
 -- isSolved sud checks if sud is already solved, i.e. there are no blanks
 isSolved :: Sudoku -> Bool
