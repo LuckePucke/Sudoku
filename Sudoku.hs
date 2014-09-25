@@ -1,6 +1,7 @@
 module Sudoku where
 
 import Test.QuickCheck
+import Data.Char
 
 -------------------------------------------------------------------------
 
@@ -78,12 +79,24 @@ isSolved s = and [
 
 -- printSudoku sud prints a representation of the sudoku sud on the screen
 printSudoku :: Sudoku -> IO ()
-printSudoku = undefined
+printSudoku (Sudoku m) = printHelp m []
+
+printHelp :: [[Maybe Int]] -> String -> IO ()
+printHelp [[]]             s = putStr (reverse('\n':s))
+printHelp ([]:l)           s = printHelp l ('\n':s)
+printHelp ((Nothing:r):l)  s = printHelp (r:l) ('.':s)
+printHelp (((Just n):r):l) s = printHelp (r:l) ((intToDigit n):s)
 
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
 readSudoku :: FilePath -> IO Sudoku
-readSudoku = undefined
+readSudoku path = undefined
+
+readHelp :: String -> [[Maybe Int]] -> [[Maybe Int]]
+readHelp "\n"         l = l
+readHelp ('\n':s)     l = readHelp s ([]:l)
+readHelp ('.':s) (fl:l) = readHelp s ((Nothing:fl):l)
+readHelp (c:s)   (fl:l) = readHelp s (((Just (digitToInt c)):fl):l)
 
 -------------------------------------------------------------------------
 
