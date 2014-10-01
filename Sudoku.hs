@@ -112,12 +112,21 @@ readHelp' (c:s)   = Just i  : readHelp' s
 
 -- cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
-cell = undefined
+cell = frequency
+    [
+        (9, return Nothing),
+        (1, do i <- choose (1,9)
+               return (Just i))
+    ]
 
 -- an instance for generating Arbitrary Sudokus
 instance Arbitrary Sudoku where
   arbitrary =
     do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
        return (Sudoku rows)
+
+prop_Sudoku :: Sudoku -> Bool
+prop_Sudoku = isSudoku
+-- Why not just test quickCheck isSudoku?
 
 -------------------------------------------------------------------------
