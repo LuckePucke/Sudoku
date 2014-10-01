@@ -90,13 +90,23 @@ printHelp (((Just n):r):l) s = printHelp (r:l) ((intToDigit n):s)
 -- readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
 readSudoku :: FilePath -> IO Sudoku
-readSudoku path = undefined
+readSudoku path = 
+    do  content <- readFile path
+        let rows = lines content
+        let sudo = Sudoku (readHelp rows)
+        if isSudoku sudo
+            then return sudo
+            else error "readSudoku: File doesn't contain a sudoku."
 
-readHelp :: String -> [[Maybe Int]] -> [[Maybe Int]]
-readHelp "\n"         l = l
-readHelp ('\n':s)     l = readHelp s ([]:l)
-readHelp ('.':s) (fl:l) = readHelp s ((Nothing:fl):l)
-readHelp (c:s)   (fl:l) = readHelp s (((Just (digitToInt c)):fl):l)
+readHelp :: [String] -> [[Maybe Int]]
+readHelp []     = []
+readHelp (s:ss) = (readHelp' s) : readHelp ss
+
+readHelp' :: String -> [Maybe Int]
+readHelp' ""      = []
+readHelp' ('.':s) = Nothing : readHelp' s
+readHelp' (c:s)   = Just i  : readHelp' s
+	where i = digitToInt c
 
 -------------------------------------------------------------------------
 
