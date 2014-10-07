@@ -28,7 +28,7 @@ example = Sudoku
 exampleFalse :: Sudoku
 exampleFalse = Sudoku
     [ 
-        [Just 10, Just 0, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing],
+        [Just 10, Just 1, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing],
         [Nothing,Just 5, Nothing,Nothing,Nothing,Nothing,Just 1, Just 8, Nothing],
         [Nothing,Nothing,Just 9, Just 2, Nothing,Just 4, Just 7, Nothing,Nothing],
         [Nothing,Nothing,Nothing,Nothing,Just 1, Just 3, Nothing,Just 2, Just 8],
@@ -188,5 +188,33 @@ square r x y =
             y1 = y
             y2 = y + 1
             y3 = y + 2
+
+isOkay :: Sudoku -> Bool
+isOkay s = isOkay' (blocks s)
+
+isOkay' :: [Block] -> Bool
+isOkay' []     = True
+isOkay' (b:bs) = isOkayBlock b && isOkay' bs
+
+type Pos = (Int, Int)
+
+blank :: Sudoku -> Pos
+blank s = blank' (rows s) 0 0
+
+blank' :: [[Maybe Int]] -> Int -> Int -> Pos
+blank' s x 9 = error "blank': Sudoku not empty."
+blank' s 9 y = blank' s 0 (y+1)
+blank' s x y
+    | (s!!y)!!x == Nothing = (x, y)
+    | otherwise            = blank' s (x+1) y
+
+prop_blank :: Sudoku -> Bool
+prop_blank s =
+    where
+        b = blank (rows s)
+        x = fst b
+        y = snd b
+
+
 
 
