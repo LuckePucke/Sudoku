@@ -106,7 +106,7 @@ readHelp' :: String -> [Maybe Int]
 readHelp' ""      = []
 readHelp' ('.':s) = Nothing : readHelp' s
 readHelp' (c:s)   = Just i  : readHelp' s
-	where i = digitToInt c
+    where i = digitToInt c
 
 -------------------------------------------------------------------------
 
@@ -130,3 +130,27 @@ prop_Sudoku = isSudoku
 -- Why not just test quickCheck isSudoku?
 
 -------------------------------------------------------------------------
+
+type Block = [Maybe Int]
+
+
+-- isOkayBlock checks if 
+isOkayBlock :: Block -> Bool
+isOkayBlock block = blockOK block []
+
+blockOK :: Block -> [Maybe Int] -> Bool
+blockOK []           _ = True
+blockOK (Nothing:as) b = blockOK as b
+blockOK (a:as) b
+    | equalsAny a b = False
+    | otherwise     = blockOK as (a:b)
+
+equalsAny :: Eq a => a -> [a] -> Bool
+equalsAny _ [] = False
+equalsAny a (b:bs)
+    | a == b    = True
+    | otherwise = equalsAny a bs
+
+
+
+
