@@ -133,7 +133,6 @@ prop_Sudoku = isSudoku
 
 type Block = [Maybe Int]
 
-
 -- isOkayBlock checks if 
 isOkayBlock :: Block -> Bool
 isOkayBlock block = blockOK block []
@@ -151,6 +150,43 @@ equalsAny a (b:bs)
     | a == b    = True
     | otherwise = equalsAny a bs
 
+-- Combines 3 lists making a longer list
+-- [a] -> [b] -> [c] -> [a, b, c]
+tripend :: Ord a => [a] -> [a] -> [a] -> [a]
+tripend a b c = append (append (append (append a []) b) []) c
 
+-- Help function for tripend
+append :: Ord a => [a] -> [a] -> [a]
+append []     b = b
+append (a:as) b = append as (a:b)
+
+blocks :: Sudoku -> [Block]
+blocks s = tripend (rows s) (columns (rows s) 0) (squares (rows s) 0 0)
+
+prop_blocks :: Sudoku -> Bool
+prop_blocks s = length bs == 27 && and [length a == 9 | a <- bs]
+    where
+        bs = blocks s
+
+columns :: [Block] -> Int -> [Block]
+columns _    9 = []
+columns rows n = column rows n : columns rows (n+1)
+
+column :: [Block] -> Int -> Block
+column []     _ = []
+column (r:rs) n = r!!n : column rs n
+
+squares :: [Block] -> Int -> Int -> [Block]
+squares r 9 6 = []
+squares r 9 y = square r 0 (y+3) : squares r 3 (y+3)
+squares r x y = square r x y     : squares r (x+3) y
+
+square :: [Block] -> Int -> Int -> Block
+square r x y = 
+    tripend (take 3 (drop x (r!!y1))) (take 3 (drop x (r!!y2))) (take 3 (drop x (r!!y3)))
+        where
+            y1 = y
+            y2 = y + 1
+            y3 = y + 2
 
 
